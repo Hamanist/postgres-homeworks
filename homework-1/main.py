@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 import psycopg2
 
-
 load_dotenv()
 try:
     with psycopg2.connect(
@@ -15,14 +14,27 @@ try:
             port=os.getenv('DB_PORT')
     ) as connection:
         with connection.cursor() as cursor:
-            cursor.execute(
-                'SELECT version();'
-            )
-            print(f'СЕРВЕР {cursor.fetchone()}')
+            cursor.execute("TRUNCATE TABLE employees RESTART IDENTITY CASCADE;")
+
+            with open('north_data/employees_data.csv', 'r', encoding='utf-8') as emp:
+                emp_csv = csv.DictReader(emp)
+                for data in emp_csv:
+                    cursor.execute(
+                        '''INSERT INTO employees (first_name, last_name, title, birth_date, notes)
+                        VALUES (%s, %s, %s, %s, %s) ''', (data['first_name'],
+                                                          data['last_name'],
+                                                          data['title'],
+                                                          data['birth_date'],
+                                                          data['notes']
+                                                          )
+                    )
+
+            # with open(file='north_data/customers_data.csv', mode='r', encoding='utf-8') as cust:
+            #     cust_csv = csv.DictReader(cust)
+            #
+            # cursor.execute('SELECT * FROM employees;')
+            # print(cursor.fetchall())
 
 
 except Exception as ex:
     print(f'Что то не так {ex}')
-finally:
-    if not connection:
-        connection.close()

@@ -36,13 +36,26 @@ try:
                 for data_cust in cust_csv:
                     cursor.execute('''INSERT INTO customers ("customer_id", "company_name", "contact_name")
                     VALUES (%s, %s, %s)''', (data_cust["customer_id"],
-                                            data_cust["company_name"],
-                                            data_cust["contact_name"]
-                                            )
+                                             data_cust["company_name"],
+                                             data_cust["contact_name"]
+                                             )
+                                   )
+            cursor.execute('''TRUNCATE TABLE orders RESTART IDENTITY CASCADE;''')
+
+            with open(file='north_data/orders_data.csv') as order:
+                ord_scv = csv.DictReader(order)
+                for data_ord in ord_scv:
+                    cursor.execute('''INSERT INTO orders ("order_id", "customer_id", "employee_id", "order_date", "ship_city")
+                    VALUES (%s, %s, %s, %s, %s)''', (
+                        data_ord['order_id'],
+                        data_ord['customer_id'],
+                        data_ord['employee_id'],
+                        data_ord['order_date'],
+                        data_ord['ship_city'],
+                    )
                                    )
 
-
-            cursor.execute('SELECT * FROM customers;')
+            cursor.execute('SELECT * FROM orders;')
             print(cursor.fetchall())
 
 

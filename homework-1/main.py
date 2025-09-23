@@ -29,11 +29,21 @@ try:
                                                           )
                     )
 
-            # with open(file='north_data/customers_data.csv', mode='r', encoding='utf-8') as cust:
-            #     cust_csv = csv.DictReader(cust)
-            #
-            # cursor.execute('SELECT * FROM employees;')
-            # print(cursor.fetchall())
+            cursor.execute('''TRUNCATE TABLE customers RESTART IDENTITY CASCADE;''')
+
+            with open(file='north_data/customers_data.csv', mode='r', encoding='utf-8') as cust:
+                cust_csv = csv.DictReader(cust)
+                for data_cust in cust_csv:
+                    cursor.execute('''INSERT INTO customers ("customer_id", "company_name", "contact_name")
+                    VALUES (%s, %s, %s)''', (data_cust["customer_id"],
+                                            data_cust["company_name"],
+                                            data_cust["contact_name"]
+                                            )
+                                   )
+
+
+            cursor.execute('SELECT * FROM customers;')
+            print(cursor.fetchall())
 
 
 except Exception as ex:

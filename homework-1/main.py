@@ -14,7 +14,11 @@ try:
             port=os.getenv('DB_PORT')
     ) as connection:
         with connection.cursor() as cursor:
+
+            # Очистка таблиц при повторном использовании
+            cursor.execute("TRUNCATE TABLE orders RESTART IDENTITY CASCADE;")
             cursor.execute("TRUNCATE TABLE employees RESTART IDENTITY CASCADE;")
+            cursor.execute("TRUNCATE TABLE customers RESTART IDENTITY CASCADE;")
 
             with open('north_data/employees_data.csv', 'r', encoding='utf-8') as emp:
                 emp_csv = csv.DictReader(emp)
@@ -29,8 +33,6 @@ try:
                                                           )
                     )
 
-            cursor.execute('''TRUNCATE TABLE customers RESTART IDENTITY CASCADE;''')
-
             with open(file='north_data/customers_data.csv', mode='r', encoding='utf-8') as cust:
                 cust_csv = csv.DictReader(cust)
                 for data_cust in cust_csv:
@@ -40,9 +42,8 @@ try:
                                              data_cust["contact_name"]
                                              )
                                    )
-            cursor.execute('''TRUNCATE TABLE orders RESTART IDENTITY CASCADE;''')
 
-            with open(file='north_data/orders_data.csv') as order:
+            with open(file='north_data/orders_data.csv', mode='r', encoding='utf-8') as order:
                 ord_scv = csv.DictReader(order)
                 for data_ord in ord_scv:
                     cursor.execute('''INSERT INTO orders ("order_id", "customer_id", "employee_id", "order_date", "ship_city")
@@ -51,7 +52,7 @@ try:
                         data_ord['customer_id'],
                         data_ord['employee_id'],
                         data_ord['order_date'],
-                        data_ord['ship_city'],
+                        data_ord['ship_city']
                     )
                                    )
 

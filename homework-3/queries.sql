@@ -15,7 +15,17 @@ WHERE
 -- имя поставщика и его телефон (contact_name и phone в табл suppliers) для таких продуктов,
 -- которые не сняты с продажи (поле discontinued) и которых меньше 25 и которые в категориях Dairy Products и Condiments.
 -- Отсортировать результат по возрастанию количества оставшегося товара.
-
+SELECT p.product_name,
+	p.units_in_stock,
+	s.contact_name,
+	s.phone
+FROM products p
+INNER JOIN suppliers s USING(supplier_id)
+INNER JOIN categories c USING(category_id)
+WHERE discontinued=0
+	AND p.units_in_stock < 25
+	AND category_name IN ('Dairy Products', 'Condiments')
+ORDER BY p.units_in_stock ASC
 
 -- 3. Список компаний заказчиков (company_name из табл customers), не сделавших ни одного заказа
 
